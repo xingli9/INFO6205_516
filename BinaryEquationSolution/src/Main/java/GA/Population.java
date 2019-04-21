@@ -1,10 +1,14 @@
+package GA;
+
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Random;
 
 public class Population {
 
     private Individual[] individuals;
     private int size = 1000;
+    private int genCount;
 
     public Population() {
         individuals = new Individual[size];
@@ -45,7 +49,6 @@ public class Population {
     }
 
     public void sort() {
-
         Arrays.sort(individuals, new Comparator<Individual>() {
             @Override
             public int compare(Individual o1, Individual o2) {
@@ -59,9 +62,9 @@ public class Population {
     public void generateIndividuals(int size) {
         individuals = new Individual[size];
         for (int i = 0; i < size; i++) {
-            Individual individual = new Individual();
-            individuals[i] = individual.getRandomIndividual();
+            individuals[i] = getRandomIndividual();
         }
+        setGenCount(0);
     }
 //---------
     private static class comparator implements Comparator<Individual> {
@@ -70,5 +73,38 @@ public class Population {
         public int compare(Individual o1, Individual o2) {
             return (int) (o2.getFitness() - o1.getFitness());
         }
+    }
+
+    /**
+     * Generate a random Individual object
+     * @return The reference of Individual object with a random x,and y
+     */
+    public Individual getRandomIndividual() {
+        Random random = new Random();
+        int[][] rst = new int[Individual.range.length][31];
+        for (int i = 0; i < Individual.range.length; i++) {
+            int[] x = new int[31];
+            int NumOfIndex = random.nextInt(x.length - 10);
+            for (int j = 0; j < NumOfIndex; j++) {
+                int nextIndex = Individual.cutIndex[i] + random.nextInt(x.length - Individual.cutIndex[i]);
+
+                x[nextIndex] = 1;
+            }
+            if (!Individual.isValid(i, x)) {
+                i--;
+                continue;
+            }
+            rst[i] = x;
+        }
+        Individual individual = new Individual(rst);
+        return individual;
+    }
+
+    public int getGenCount() {
+        return genCount;
+    }
+
+    public void setGenCount(int input) {
+        this.genCount = input;
     }
 }
